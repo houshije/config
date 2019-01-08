@@ -48,6 +48,17 @@ func SetTitle()
         call append(line(".")+2, "#endif")
     endif
 endfunc 
+
+" 允许在vim中使用鼠标配置
+if has('mouse')
+    set mouse=a
+endif
+" 按键映射
+" <F6> 可以使用鼠标
+" <F7> 不可以使用鼠标
+map <F6> :set mouse-=a<CR>
+map <F7> :set mouse=a<CR>
+
 " no backup
 set nobackup
 set nowritebackup
@@ -89,10 +100,6 @@ set wildignore+=*.o,*.obj,*.a,*.so,*.d
 
 set fileencodings=ucs-bom,utf8,cp936,gbk,big5,euc-jp,euc-kr,gb18130,latin1
 
-" Mouse Support ---------------------------------------
-if has('mouse')
-    set mouse=a
-endif
 
 " Fonts -----------------------------------------------
 set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 11
@@ -183,8 +190,6 @@ nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 map <F2> :Ack 
 " find git cinfict
 map <F5> /=======<CR>
-map <F6> :set mouse-=a<CR>
-map <F7> :set mouse=a<CR>
 " ===================
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 
