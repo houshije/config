@@ -49,7 +49,9 @@ func SetTitle()
     endif
 endfunc 
 
-" 允许在vim中使用鼠标配置
+" 光标自动定位到文件尾
+autocmd BufNewFile * normal G
+
 if has('mouse')
     set mouse=a
 endif
@@ -59,14 +61,14 @@ endif
 map <F6> :set mouse-=a<CR>
 map <F7> :set mouse=a<CR>
 
+if has("autocmd")                                                          
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif                                                        
+endif 
+
 " no backup
 set nobackup
 set nowritebackup
 set noswapfile
-
-"new create *.h file，auto insert file headers 
-"autocmd BufNewFile *.h exec ":call SetTitle()"
-autocmd BufNewFile * normal G
 
 " use space instead of tab
 set textwidth=80
@@ -87,8 +89,6 @@ set showcmd
 set title
 set wildmenu
 set wildmode=list:longest,list:full
-
-
 
 " complete opts
 set completeopt=menu,longest
@@ -121,24 +121,20 @@ let g:mapleader="\<space>"
 set rtp+=~/.vim/bundle/vundle
 call vundle#rc()
 
+Plugin 'ctrlpvim/ctrlp.vim'
+
 Plugin 'gmarik/vundle'
-
 Plugin 'scrooloose/nerdtree'
-
-Plugin 'Clam'
 Plugin 'Conque-Shell'
 Plugin 'DoxygenToolkit.vim'
 Plugin 'Gundo'
 Plugin 'majutsushi/tagbar'
-Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'powerline/fonts'
 Plugin 'godlygeek/tabular'
-
 " Color Schemes
 Plugin 'tomasr/molokai'
-
 " Programming
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
@@ -149,7 +145,6 @@ Plugin 'mileszs/ack.vim'
 if has("gui_running")
     "set background=dark
     colorscheme molokai
-
     set guioptions-=T
     "set guioptions-=m
     "set guioptions-=r
@@ -161,19 +156,28 @@ else
 endif
 
 " Plugins ---------------------------------------------
+" CtrlP -----------------------------------------------
+" https://github.com/ctrlpvim/ctrlp
+" git clone git://github.com/ctrlpvim/ctrlp.git
+" enable cache for ctrlp
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+" only search the filename and use regex
+let g:ctrlp_by_filename = 1
+let g:ctrlp_regexp = 1
+" cancel the limit to max files number
+let g:ctrlp_max_files = 0
+let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:10,results:10'
+
 " ack.vim, Ack front-end for vim ----------------------
 " http://www.vim.org/scripts/script.php?script_id=2572
 " https://github.com/mileszs/ack.vim/
 " git clone git://github.com/mileszs/ack.vim.git
 " https://github.com/ggreer/the_silver_searcher/
 let g:ackprg = 'ag --nogroup --nocolor --column'
-
-" Clam ------------------------------------------------
-" http://www.vim.org/scripts/script.php?script_id=4000
-" https://github.com/sjl/clam.vim
-" https://bitbucket.org/sjl/clam.vim/
-" hg clone https://bitbucket.org/sjl/clam.vim
-nnoremap <leader>c :Clam<Space>
+" ========customize=======
+" open search
+map <c-u> :Ack<space> 
 
 " Cscope ----------------------------------------------
 nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>
@@ -185,11 +189,6 @@ nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
-" ========customize=======
-" open search
-map <F2> :Ack 
-" find git cinfict
-map <F5> /=======<CR>
 " ===================
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 
@@ -202,21 +201,6 @@ if has("cscope")
   endif        
 endif  
 
-" CtrlP -----------------------------------------------
-" https://github.com/ctrlpvim/ctrlp
-" git clone git://github.com/ctrlpvim/ctrlp.git
-
-" enable cache for ctrlp
-let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-
-" only search the filename and use regex
-let g:ctrlp_by_filename = 1
-let g:ctrlp_regexp = 1
-
-" cancel the limit to max files number
-let g:ctrlp_max_files = 0
-let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 
 " Doxygen ---------------------------------------------
 " http://www.vim.org/scripts/script.php?script_id=987
@@ -226,6 +210,7 @@ let g:DoxygenToolkit_briefTag_pre="@Synopsis"
 let g:DoxygenToolkit_paramTag_pre="@Param:"
 let g:DoxygenToolkit_paramTag_post=" - "
 let g:DoxygenToolkit_returnTag="@Returns:"
+nnoremap <leader>u :GundoToggle<CR>
 
 " Gundo -----------------------------------------------
 " http://sjl.bitbucket.org/gundo.vim/
@@ -239,7 +224,6 @@ let g:gundo_right = 1
 " http://github.com/scrooloose/nerdtree
 " git clone git://github.com/scrooloose/nerdtree.git
 nnoremap <leader>nt :NERDTreeToggle<CR>
-map <F8> :NERDTree<CR>
 let NERDTreeWinPos=1
 let NERDTreeWinSize=30
 autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa! | endif
@@ -258,9 +242,7 @@ let g:SuperTabRetainCompletionType=1
 " http://www.vim.org/scripts/script.php?script_id=3465
 " http://github.com/majutsushi/tagbar
 " git clone git://github.com/majutsushi/tagbar.git
-" nnoremap <leader>tb :TagbarToggle<CR>
-map <F9> :TagbarToggle<CR>
-
+nnoremap <leader>tb :TagbarToggle<CR>
 let g:tagbar_left = 1
 let g:tagbar_width = 40
 
@@ -290,7 +272,7 @@ let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
 " https://github.com/Valloric/YouCompleteMe
 " git clone git://github.com/Valloric/YouCompleteMe.git
 
-let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
+ let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/.ycm_extra_conf.py'
 " enable completion from tags
 let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_seed_identifiers_with_syntax = 1 
